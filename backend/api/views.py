@@ -135,3 +135,18 @@ class PrescriptionDetailView(generics.RetrieveAPIView):
             return Prescription.objects.filter(appointment__patient = user)
 
         return Prescription.objects.all()
+
+
+class  ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profile, created = UserProfile.objects.get_or_create(user = request.user, defaults={'role': 'patient'})
+        
+        return Response({
+            'username' : request.user.username,
+            'role': profile.role,
+            'first_name': request.user.first_name,
+            'last_name': request.user.last_name,
+            'email': request.user.email,
+        })

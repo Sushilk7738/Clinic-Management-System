@@ -19,6 +19,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -28,8 +30,10 @@ SECRET_KEY = 'django-insecure-=rgk=yny_1tolwu7&wg0+#hfhz%ohlrq@u6dxfh^6&jj@7!+cv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
 ALLOWED_HOSTS = [
-    'http://localhost:5173',
+    '127.0.0.1',
+    'localhost',
 ]
 
 

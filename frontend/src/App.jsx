@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ProtectedRoute from './components/ProtectedRoute';
+
 
 const App = ()=>{
   return(
@@ -8,7 +10,24 @@ const App = ()=>{
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/patient" element={<h1>Patient Dashboard</h1>} />
+          <Route 
+            path="/patient" 
+            element={
+              <ProtectedRoute>
+                <h1>Patient Dashboard</h1>
+              </ProtectedRoute>
+            } 
+          />
+
+          <Route
+            path='/doctor'
+            element={
+              <ProtectedRoute>
+                <h1>Doctor Dashboard</h1>
+              </ProtectedRoute>
+            }
+          />
+            
         </Routes>
       </BrowserRouter>
   )

@@ -11,6 +11,8 @@ from .serializers import UserProfileSerializer, AppointmentSerializer, Prescript
 
 #* Registration
 class RegisterView(APIView):
+    authentication_classes = []
+    permission_classes = []
     
     def post(self, request):
         serializer = UserSerializer(data = request.data)

@@ -3,7 +3,7 @@ import { useState } from "react";
 import api from '../api';
 import 'animate.css';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Login = ()=>{
     const navigate = useNavigate();
@@ -75,9 +75,9 @@ const Login = ()=>{
 
                 <p className="text-center font-semibold text-sm text-slate-500 mt-4">
                     No account?{' '}
-                    <a href="/register" className="text-blue-700 hover:underline" >
+                    <Link to="/register" className="text-blue-700 hover:underline" >
                         Register
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>

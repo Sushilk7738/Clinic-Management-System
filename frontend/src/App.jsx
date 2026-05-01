@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
+import PatientDashboard from './pages/patient/PatientDashboard';
 
 
 const App = ()=>{
@@ -13,8 +14,8 @@ const App = ()=>{
           <Route 
             path="/patient" 
             element={
-              <ProtectedRoute>
-                <h1>Patient Dashboard</h1>
+              <ProtectedRoute role="patient">
+                <PatientDashboard/>
               </ProtectedRoute>
             } 
           />
@@ -22,12 +23,22 @@ const App = ()=>{
           <Route
             path='/doctor'
             element={
-              <ProtectedRoute>
+              <ProtectedRoute role="doctor">
                 <h1>Doctor Dashboard</h1>
               </ProtectedRoute>
             }
           />
             
+          <Route
+            path='/admin'
+            element={
+              <ProtectedRoute role="receptionist">
+                <h1>Admin Dashboard</h1>
+              </ProtectedRoute>
+            }
+          
+          />
+
         </Routes>
       </BrowserRouter>
   )

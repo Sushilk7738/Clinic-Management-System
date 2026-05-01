@@ -28,6 +28,7 @@ const Login = ()=>{
 
             const profileRes = await api.get('/api/profile/');
             const role = profileRes.data.role;
+            localStorage.setItem("role", role)
 
             if (role === 'patient') navigate('/patient');
             else if (role === 'doctor') navigate('/doctor');

@@ -1,4 +1,4 @@
-import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constants";
+import { ACCESS_TOKEN, REFRESH_TOKEN, USER_ROLE } from "../constants";
 import { useState } from "react";
 import api from '../api';
 import 'animate.css';
@@ -26,9 +26,20 @@ const Login = ()=>{
             localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
             toast.success("Login success");
 
-            const profileRes = await api.get('/api/profile/');
-            const role = profileRes.data.role;
-            localStorage.setItem("role", role)
+            setTimeout(async () => {
+                try {
+                    const profileRes = await api.get('/api/profile/');
+                    const role = profileRes.data.role;
+                    localStorage.setItem(USER_ROLE, role);
+
+                    if (role === 'patient') navigate('/patient');
+                    else if (role === 'doctor') navigate('/doctor');
+                    else navigate('/admin');
+
+                } catch {
+                    toast.error("Failed to fetch profile");
+                }
+            }, 100);
 
             if (role === 'patient') navigate('/patient');
             else if (role === 'doctor') navigate('/doctor');

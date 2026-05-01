@@ -3,6 +3,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
 import PatientDashboard from './pages/patient/PatientDashboard';
+import Layout from './components/Layout';
+import BookAppointment from './pages/patient/BookAppointment';
 
 
 const App = ()=>{
@@ -15,16 +17,32 @@ const App = ()=>{
             path="/patient" 
             element={
               <ProtectedRoute role="patient">
-                <PatientDashboard/>
+                <Layout>
+                  <PatientDashboard/>
+                </Layout>
               </ProtectedRoute>
             } 
           />
+
+          <Route 
+            path="/patient/book"
+            element={
+              <ProtectedRoute role="patient">
+                <Layout>
+                  <BookAppointment />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          
 
           <Route
             path='/doctor'
             element={
               <ProtectedRoute role="doctor">
-                <h1>Doctor Dashboard</h1>
+                <Layout>
+                  {/* <DoctorDashboard/> */}
+                </Layout>
               </ProtectedRoute>
             }
           />

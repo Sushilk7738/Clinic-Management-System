@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PatientDashboard from './pages/patient/PatientDashboard';
 import Layout from './components/Layout';
 import BookAppointment from './pages/patient/BookAppointment';
+import MyAppointments from './pages/patient/MyAppointments';
 
 
 const App = ()=>{
@@ -30,6 +31,17 @@ const App = ()=>{
               <ProtectedRoute role="patient">
                 <Layout>
                   <BookAppointment />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route 
+            path="/patient/appointments"
+            element={
+              <ProtectedRoute role="patient">
+                <Layout>
+                  <MyAppointments />
                 </Layout>
               </ProtectedRoute>
             }

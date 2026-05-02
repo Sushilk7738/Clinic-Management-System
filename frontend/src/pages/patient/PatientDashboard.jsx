@@ -82,7 +82,7 @@ const PatientDashboard = ()=>{
 
                 </div>
 
-                    <div className="bg-white p-6 rounded-xl shadow-md">
+                    <div className="bg-white p-6 rounded-xl shadow-md mt-5">
                         <h3 className="text-lg font-semibold text-slate-800 mb-4">
                             Upcoming Appointments
                         </h3>

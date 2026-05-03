@@ -4,7 +4,7 @@ from .views import (
     DoctorListView,
     AppointmentListCreateView,
     AppointmentDetailView,
-    PrescriptionCreateView,
+    PrescriptionListCreateView,
     PrescriptionDetailView,
     ProfileView,
 )
@@ -22,7 +22,6 @@ urlpatterns = [
     path('appointments/', AppointmentListCreateView.as_view()),
     path('appointments/<int:pk>/', AppointmentDetailView.as_view()),
 
-    path('prescriptions/', PrescriptionCreateView.as_view()),
+    path('prescriptions/', PrescriptionListCreateView.as_view()),
     path('prescriptions/<int:pk>/', PrescriptionDetailView.as_view()),
-
 ]

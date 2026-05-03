@@ -40,14 +40,18 @@ class UserSerializer(serializers.ModelSerializer):
 class AppointmentSerializer(serializers.ModelSerializer):
     patient_name = serializers.SerializerMethodField()
     doctor_name = serializers.SerializerMethodField()
+    prescription = serializers.SerializerMethodField()
+    prescription_data = serializers.SerializerMethodField()
+
 
     class Meta:
         model = Appointment
         fields = ['id', 'patient', 'doctor', 'patient_name', 'doctor_name',
-                'date', 'time', 'status', 'reason', 'created_at']
+                'date', 'time', 'status', 'reason', 'created_at', 'prescription', 'prescription_data']
         extra_kwargs = {
             'patient': {'read_only': True},
         }
+    
         
     def get_patient_name(self, obj):
         return f"{obj.patient.first_name} {obj.patient.last_name}"
@@ -55,6 +59,18 @@ class AppointmentSerializer(serializers.ModelSerializer):
     def get_doctor_name(self, obj):
         return f"{obj.doctor.first_name} {obj.doctor.last_name}"
     
+    def get_prescription(self, obj):
+        return Prescription.objects.filter(appointment=obj).exists()
+        
+    def get_prescription_data(self, obj):
+        try:
+            p = obj.prescription
+            return {
+                "medicines": p.medicines,
+                "notes": p.notes,
+            }
+        except:
+            return None
 
 class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:

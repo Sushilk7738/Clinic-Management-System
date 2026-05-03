@@ -113,15 +113,28 @@ class AppointmentDetailView(APIView):
         return Response({"message": 'Appointment Deleted Successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
 
-class PrescriptionCreateView(generics.CreateAPIView):
+class PrescriptionListCreateView(generics.ListCreateAPIView):
     serializer_class = PrescriptionSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.profile.role == 'patient':
+            return Prescription.objects.filter(appointment__patient=user)
+
+        elif user.profile.role == 'doctor':
+            return Prescription.objects.filter(appointment__doctor=user)
+
+        return Prescription.objects.all()
 
     def perform_create(self, serializer):
         if self.request.user.profile.role != 'doctor':
             raise PermissionDenied("Only Doctor can create prescriptions")
 
         serializer.save()
+
+
 
 class PrescriptionDetailView(generics.RetrieveAPIView):
     serializer_class = PrescriptionSerializer

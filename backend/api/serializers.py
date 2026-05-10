@@ -60,7 +60,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
         return f"{obj.doctor.first_name} {obj.doctor.last_name}"
     
     def get_prescription(self, obj):
-        return Prescription.objects.filter(appointment=obj).exists()
+        return hasattr(obj, 'prescription')
         
     def get_prescription_data(self, obj):
         try:

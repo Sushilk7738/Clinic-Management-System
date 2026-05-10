@@ -50,18 +50,21 @@ class AppointmentListCreateView(APIView):
     def get(self, request):
         role = request.user.profile.role
 
+        queryset = Appointment.objects.select_related(
+            'patient',
+            'doctor'
+        ).prefetch_related('prescription')
+
         if role == 'patient':
-            appts = Appointment.objects.filter(patient = request.user)
-
-        elif role == 'doctor':
-            appts = Appointment.objects.filter(doctor = request.user)
+            queryset = queryset.filter(patient = request.user)
         
-        else:
-            appts = Appointment.objects.all()
+        elif role == 'doctor':
+            queryset = queryset.filter(doctor = request.user)
 
-        serializer = AppointmentSerializer(appts, many = True)
+        serializer = AppointmentSerializer(queryset, many=True)
         return Response(serializer.data)
 
+        
     def post(self, request):
         if request.user.profile.role != 'patient':
             return Response({"error": 'Only patients can book appointments'}, status=status.HTTP_403_FORBIDDEN)
@@ -79,7 +82,10 @@ class AppointmentDetailView(APIView):
 
     def get_object(self, pk):
         try:
-            return Appointment.objects.get(pk=pk)
+            return Appointment.objects.select_related(
+                'patient', 'doctor'
+            ).prefetch_related('prescription').get(pk=pk)
+
         except Appointment.DoesNotExist:
             return None
 
@@ -87,10 +93,12 @@ class AppointmentDetailView(APIView):
         appt = self.get_object(pk)
 
         #* permission check
+        role = request.user.profile.role
+        
         if not appt:
             return Response({'error': 'Not Found'}, status=status.HTTP_404_NOT_FOUND)
 
-        if request.user != appt.patient and request.user != appt.doctor:
+        if (request.user != appt.patient and request.user != appt.doctor and role != 'receptionist'):
             return Response({'error': 'Not Allowed'}, status=status.HTTP_403_FORBIDDEN)
 
         serializer = AppointmentSerializer(appt, data = request.data, partial = True)
@@ -103,10 +111,11 @@ class AppointmentDetailView(APIView):
     def delete(self, request, pk):
         appt  = self.get_object(pk)
 
+        role = request.user.profile.role
         if not appt:
             return Response({'error' : 'Not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        if request.user != appt.patient and request.user != appt.doctor:
+        if (request.user != appt.patient and request.user != appt.doctor and role != 'receptionist'):
             return Response({'error': 'Not Allowed'}, status=status.HTTP_403_FORBIDDEN)
 
         appt.delete()

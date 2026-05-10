@@ -18,37 +18,32 @@ const Login = ()=>{
         });
     }
 
-    const handleLogin = async(e)=>{
-        e.preventDefault();
-        try {
-            const res = await api.post('/api/token/', form);
-            localStorage.setItem(ACCESS_TOKEN, res.data.access);
-            localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
-            toast.success("Login success");
+    const handleLogin = async (e) => {
+    e.preventDefault();
 
-            setTimeout(async () => {
-                try {
-                    const profileRes = await api.get('/api/profile/');
-                    const role = profileRes.data.role;
-                    localStorage.setItem(USER_ROLE, role);
+    try {
+        
+        const res = await api.post('/api/token/', form);
 
-                    if (role === 'patient') navigate('/patient');
-                    else if (role === 'doctor') navigate('/doctor');
-                    else navigate('/admin');
+        localStorage.setItem(ACCESS_TOKEN, res.data.access);
+        localStorage.setItem(REFRESH_TOKEN, res.data.refresh);
 
-                } catch {
-                    toast.error("Failed to fetch profile");
-                }
-            }, 100);
+        // Fetch profile
+        const profileRes = await api.get('/api/profile/');
+        const role = profileRes.data.role;
 
-            if (role === 'patient') navigate('/patient');
-            else if (role === 'doctor') navigate('/doctor');
-            else navigate('/admin')
-            
-        } catch (err){
+        localStorage.setItem(USER_ROLE, role);
+
+        toast.success("Login successful");
+
+        if (role === 'patient') navigate('/patient');
+        else if (role === 'doctor') navigate('/doctor');
+        else navigate('/admin');
+
+    } catch (err) {
             toast.error("Invalid username or password");
-        }
     }
+};
 
     
     return(

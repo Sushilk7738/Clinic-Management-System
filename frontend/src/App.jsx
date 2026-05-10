@@ -8,6 +8,7 @@ import BookAppointment from './pages/patient/BookAppointment';
 import MyAppointments from './pages/patient/MyAppointments';
 import MyPrescriptions from './pages/patient/MyPrescriptions';
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
+import ReceptionistDashboard from './pages/receptionist/ReceptionistDashboard';
 
 
 const App = ()=>{
@@ -81,7 +82,9 @@ const App = ()=>{
             path='/admin'
             element={
               <ProtectedRoute role="receptionist">
-                <h1>Admin Dashboard</h1>
+                <Layout>
+                  <ReceptionistDashboard/>
+                </Layout>
               </ProtectedRoute>
             }
           

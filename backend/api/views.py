@@ -44,6 +44,44 @@ class DoctorListView(APIView):
         return Response(data)
 
 
+class AvailableSlotsView(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        doctor_id = request.GET.get('doctor')
+        date = request.GET.get('date')
+        ALL_SLOTS = [
+            "09:00",
+            "10:00",
+            "11:00",
+            "12:00",
+            "14:00",
+            "15:00",
+            "16:00",
+        ]
+
+        booked_slots = Appointment.objects.filter(
+            doctor_id = doctor_id,
+            date = date,
+            status__in = ['pending', 'confirmed']
+        ).values_list('time', flat=True)
+
+        booked_slots = [
+            slot.strftime("%H:%M")
+            for slot in booked_slots
+        ]
+        
+        
+        available_slots = [
+            slot for slot in ALL_SLOTS
+            if slot not in booked_slots
+        ]
+
+        return Response(available_slots)
+        
+
+
+
+
 class AppointmentListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 

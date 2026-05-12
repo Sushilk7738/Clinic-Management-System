@@ -72,6 +72,25 @@ class AppointmentSerializer(serializers.ModelSerializer):
         except:
             return None
 
+    def validate(self, data):
+        doctor = data.get('doctor')
+        date = data.get('date')
+        time = data.get('time')
+
+        existing_appointment = Appointment.objects.filter(
+            doctor=doctor,
+            date=date,
+            time=time,
+            status__in =['pending', 'confirmed']
+        )
+        
+        if existing_appointment.exists():
+            raise serializers.ValidationError(
+                "This doctor already has an appointment at this time"
+            )
+        
+        return data
+        
 class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Prescription

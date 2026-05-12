@@ -59,7 +59,19 @@ class Appointment(models.Model):
         
         if not hasattr(self.patient, 'profile') and self.patient.profile.role != 'patient':
             raise ValidationError("Selected patient is not patient.")
-    
+
+        existing_appointment = Appointment.objects.filter(
+            doctor = self.doctor,
+            date = self.date,
+            time = self.time,
+            status__in=['pending', 'confirmed']
+        ).exclude(id = self.id)
+
+        if existing_appointment.exists():
+            raise ValidationError(
+                "This doctor already has an appointment at this time."
+            )
+        
     def save(self, *args, **kwargs):
         self.full_clean()
         super().save(*args, **kwargs)

@@ -12,6 +12,9 @@ const BookAppointment = ()=>{
     const [date, setDate] = useState("");
     const [time, setTime] = useState("");
     const [reason, setReason] = useState("");
+    const [availableSlots, setAvailableSlots] = useState([])
+
+    
 
     useEffect(()=> {
         api.get("/api/doctors/")
@@ -28,6 +31,25 @@ const BookAppointment = ()=>{
                 toast.error("Failed to load doctors");
             });
     }, [])  
+
+    
+    useEffect(() => {
+        if(!selectedDoctor || !date) return;
+
+        api.get(
+            `/api/available-slots/?doctor=${selectedDoctor}&date=${date}`
+        )
+
+        .then(res => {
+            setAvailableSlots(res.data);
+        })
+        
+        .catch(() =>{
+            toast.error("Failed to load slots");
+        });
+        
+    }, [selectedDoctor, date]);
+
     
 
     const handleSubmit = async ()=>{
@@ -53,7 +75,10 @@ const BookAppointment = ()=>{
             setReason("");
         }
         catch (err) {
-            toast.error("Failed to book appointment");
+            toast.error(
+                err.response?.data?.non_field_errors?.[0]
+                || "Failed to book appointment"
+            );
         }
     }
     
@@ -114,14 +139,16 @@ const BookAppointment = ()=>{
                             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="">-- Choose Time --</option>
-
-                            <option value="09:00">09:00 AM</option>
-                            <option value="10:00">10:00 AM</option>
-                            <option value="11:00">11:00 AM</option>
-                            <option value="12:00">12:00 PM</option>
-                            <option value="14:00">02:00 PM</option>
-                            <option value="15:00">03:00 PM</option>
-                            <option value="16:00">04:00 PM</option>
+                            {
+                                availableSlots.map((slot) => (
+                                    <option
+                                        key={slot}
+                                        value={slot}
+                                    >
+                                        {slot}
+                                    </option>
+                                ))
+                            }
                         </select>
                     </div>
 

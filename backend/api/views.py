@@ -7,7 +7,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import UserProfile, Appointment, Prescription
 from .serializers import UserProfileSerializer, AppointmentSerializer, PrescriptionSerializer, UserSerializer
-
+from django.db.models import Count
 
 #* Registration
 class RegisterView(APIView):
@@ -78,6 +78,52 @@ class AvailableSlotsView(APIView):
 
         return Response(available_slots)
         
+
+
+class FullyBookedDatesView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        ALL_SLOTS_COUNT = 7
+        doctor_id = request.GET.get('doctor')
+        
+        appointments = Appointment.objects.filter(
+            doctor_id = doctor_id,
+            status__in = ['pending', 'confirmed']
+        )
+    
+        booked_dates = appointments.values('date').annotate(
+            total = Count('id')
+        )
+        
+        full_blocked_dates = [
+            item['date']
+            for item in booked_dates
+            if item['total'] >= ALL_SLOTS_COUNT
+        ]
+
+        return Response(full_blocked_dates)
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
 
 

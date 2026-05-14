@@ -13,8 +13,8 @@ const BookAppointment = ()=>{
     const [time, setTime] = useState("");
     const [reason, setReason] = useState("");
     const [availableSlots, setAvailableSlots] = useState([])
-
-    
+    const [fullyBookedDates, setFullyBookedDates] = useState([])
+    const [loadingSlots, setLoadingSlots] = useState(false);
 
     useEffect(()=> {
         api.get("/api/doctors/")
@@ -36,6 +36,7 @@ const BookAppointment = ()=>{
     useEffect(() => {
         if(!selectedDoctor || !date) return;
 
+        setLoadingSlots(true);
         api.get(
             `/api/available-slots/?doctor=${selectedDoctor}&date=${date}`
         )
@@ -44,12 +45,29 @@ const BookAppointment = ()=>{
             setAvailableSlots(res.data);
         })
         
+        .finally(()=> {
+            setLoadingSlots(false);
+        })
+
         .catch(() =>{
             toast.error("Failed to load slots");
         });
         
     }, [selectedDoctor, date]);
 
+    useEffect(() => {
+        if (!selectedDoctor) return;
+
+        api.get(
+            `/api/fully-booked-dates/?doctor=${selectedDoctor}`
+        )
+        .then( res => {
+            setFullyBookedDates(res.data);
+        })
+        .catch(()=> {
+            toast.error("Failed to load booked dates");
+        });
+    }, [selectedDoctor])
     
 
     const handleSubmit = async ()=>{
@@ -73,6 +91,12 @@ const BookAppointment = ()=>{
             setDate("");
             setTime("");
             setReason("");
+
+            const res = await api.get(
+                `/api/available-slots/?doctor=${selectedDoctor}&date=${date}`
+            );
+
+            setAvailableSlots(res.data)
         }
         catch (err) {
             toast.error(
@@ -123,7 +147,16 @@ const BookAppointment = ()=>{
                             type="date"
                             value={date}
                             min = { new Date().toISOString().split("T")[0]}
-                            onChange={(e) => setDate(e.target.value)}
+                            onChange={(e) => {
+                                const selected = e.target.value;
+
+                                if(fullyBookedDates.includes(selected)) {
+                                    toast.error("This date is fully booked.");
+                                    return;
+                                }
+
+                                setDate(selected);
+                            }}
                             className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -140,6 +173,22 @@ const BookAppointment = ()=>{
                         >
                             <option value="">-- Choose Time --</option>
                             {
+                                loadingSlots && (
+                                    <option disabled>
+                                        Loading slots...
+                                    </option>
+                                )
+                            }
+
+                            {
+                                !loadingSlots && availableSlots.length === 0 && (
+                                    <option disabled>
+                                        No slots available
+                                    </option>
+                                )
+                            }
+                            
+                            {
                                 availableSlots.map((slot) => (
                                     <option
                                         key={slot}
@@ -150,6 +199,8 @@ const BookAppointment = ()=>{
                                 ))
                             }
                         </select>
+
+                        
                     </div>
 
                     <div className="mb-4">

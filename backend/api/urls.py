@@ -8,6 +8,7 @@ from .views import (
     PrescriptionDetailView,
     ProfileView,
     AvailableSlotsView,
+    FullyBookedDatesView,
 )
 
 
@@ -28,5 +29,5 @@ urlpatterns = [
     path('prescriptions/', PrescriptionListCreateView.as_view()),
     path('prescriptions/<int:pk>/', PrescriptionDetailView.as_view()),
     
-    
+    path('fully-booked-dates/', FullyBookedDatesView.as_view()),
 ]

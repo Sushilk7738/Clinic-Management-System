@@ -10,6 +10,25 @@ const Navbar = () => {
     const [open , setOpen] = useState(false);
     const [name, setName] = useState("");
     const [role, setRole] = useState("");
+    const [notifications, setNotifications] = useState([]);
+    const [showNotifications, setShowNotifications] = useState(false);
+
+    
+    const unreadCount = notifications.filter(
+        notif => !notif.is_read
+    ).length;
+
+
+    useEffect(()=>{
+        api.get('/api/notifications/')
+        .then(res => {
+            setNotifications(res.data);
+        })
+        .catch(() => {
+            console.log("Failed to load notifications");
+        })
+    }, []);
+    
 
     useEffect(()=>{
         const token = localStorage.getItem(ACCESS_TOKEN);
@@ -48,40 +67,109 @@ return (
             </h1>
         </div>
 
-        <div className='relative'>
-            <button 
-                onClick={() => setOpen(!open)}
-                className="flex items-center gap-2 bg-slate-100 px-3 py-2 sm:px-4 rounded-lg hover:bg-slate-200 transition"
-            >
-                <div className="w-8 h-8 bg-blue-500 text-white flex items-center justify-center rounded-full">
-                    {name ? name[0] : "U"}
-                </div>
+        <div className='flex items-center gap-4'>
 
-                <span className="text-sm font-medium text-slate-700 hidden sm:block">
-                    {name}
-                </span>
-            </button>
-            {
-                open && (
-                    <div className="absolute right-0 mt-2 w-40 sm:w-44  bg-white shadow-lg rounded-lg p-2">
-                        <p className='px-3 py-2 font-medium text-sm text-slate-500 border-b mb-2'>
-                            {role.charAt(0).toUpperCase()+ role.slice(1)}
-                        </p>
-
-                        <p className="px-3 py-2 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded cursor-pointer">
-                            Profile
-                        </p>
-
-                        <p 
-                            onClick={handleLogout} 
-                            className="px-3 py-2 font-medium text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer"
-                        >
-                            Logout
-                        </p>
-
+            <div className='relative'>
+                <button 
+                    onClick={() => setOpen(!open)}
+                    className="flex items-center gap-2 bg-slate-100 px-3 py-2 sm:px-4 rounded-lg hover:bg-slate-200 transition"
+                >
+                    <div className="w-8 h-8 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                        {name ? name[0] : "U"}
                     </div>
-                )
-            }
+
+                    <span className="text-sm font-medium text-slate-700 hidden sm:block">
+                        {name}
+                    </span>
+                </button>
+
+                {
+                    open && (
+                        <div className="absolute right-0 mt-2 w-40 sm:w-44 bg-white shadow-lg rounded-lg p-2">
+                            <p className='px-3 py-2 font-medium text-sm text-slate-500 border-b mb-2'>
+                                {role.charAt(0).toUpperCase()+ role.slice(1)}
+                            </p>
+
+                            <p className="px-3 py-2 font-medium text-sm text-slate-700 hover:bg-slate-100 rounded cursor-pointer">
+                                Profile
+                            </p>
+
+                            <p 
+                                onClick={handleLogout} 
+                                className="px-3 py-2 font-medium text-sm text-red-600 hover:bg-red-50 rounded cursor-pointer"
+                            >
+                                Logout
+                            </p>
+
+                        </div>
+                    )
+                }
+            </div>
+
+            <div className='relative'>
+                <button
+                    onClick={async () => {
+
+                    setShowNotifications(!showNotifications);
+
+                    for (const notif of notifications) {
+
+                        if (!notif.is_read) {
+
+                            await api.patch(
+                                `/api/notifications/${notif.id}/read/`
+                            );
+                        }
+                    }
+
+                    setNotifications(
+                        notifications.map(notif => ({
+                            ...notif,
+                            is_read: true
+                        }))
+                    );
+                }}
+                    className='relative text-2xl'
+                >
+                    🔔
+                </button>
+
+                {
+                    showNotifications && (
+                        <div className='absolute right-0 mt-2 w-72 bg-white shadow-lg rounded-lg p-3 z-50'>
+                            <h3 className='font-semibold text-slate-700 mb-2'>
+                                Notifications
+                            </h3>
+
+                            {
+                                notifications.length === 0 ? (
+                                    <p className='text-sm text-slate-500'>
+                                        No Notifications
+                                    </p>
+                                ) : (
+                                    notifications.map((notif) => (
+                                        <div
+                                            key={notif.id}
+                                            className='border-b py-2'
+                                        >
+                                            {notif.message}
+                                        </div>
+                                    ))
+                                )
+                            }
+                        </div>
+                    )
+                }
+
+                {
+                    unreadCount > 0 && (
+                        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+                            {unreadCount}
+                        </span>
+                    )
+                }
+            </div>
+
         </div>
     </nav>
 )

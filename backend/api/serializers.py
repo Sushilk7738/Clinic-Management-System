@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import Appointment, UserProfile, Prescription
+from .models import Appointment, UserProfile, Prescription, Notification
 from rest_framework import serializers
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -90,6 +90,14 @@ class AppointmentSerializer(serializers.ModelSerializer):
             )
         
         return data
+    
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+        
+
         
 class PrescriptionSerializer(serializers.ModelSerializer):
     class Meta:

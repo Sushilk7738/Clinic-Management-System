@@ -9,6 +9,8 @@ from .views import (
     ProfileView,
     AvailableSlotsView,
     FullyBookedDatesView,
+    NotificationListView,
+    MarkNotificationReadView,
 )
 
 
@@ -30,4 +32,7 @@ urlpatterns = [
     path('prescriptions/<int:pk>/', PrescriptionDetailView.as_view()),
     
     path('fully-booked-dates/', FullyBookedDatesView.as_view()),
+    
+    path('notifications/', NotificationListView.as_view()),
+    path('notifications/<int:pk>/read/', MarkNotificationReadView.as_view()),
 ]

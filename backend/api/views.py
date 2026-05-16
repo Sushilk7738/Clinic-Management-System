@@ -5,9 +5,10 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .models import UserProfile, Appointment, Prescription
-from .serializers import UserProfileSerializer, AppointmentSerializer, PrescriptionSerializer, UserSerializer
+from .models import UserProfile, Appointment, Prescription, Notification
+from .serializers import NotificationSerializer, UserProfileSerializer, AppointmentSerializer, PrescriptionSerializer, UserSerializer
 from django.db.models import Count
+
 
 #* Registration
 class RegisterView(APIView):
@@ -105,27 +106,6 @@ class FullyBookedDatesView(APIView):
         return Response(full_blocked_dates)
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-
 
 
 class AppointmentListCreateView(APIView):
@@ -156,6 +136,11 @@ class AppointmentListCreateView(APIView):
 
         if serializer.is_valid():
             serializer.save(patient = request.user)
+            Notification.objects.create(
+                user = request.user,
+                message = "Your appointment has been booked successfully."
+            )
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -204,6 +189,43 @@ class AppointmentDetailView(APIView):
 
         appt.delete()
         return Response({"message": 'Appointment Deleted Successfully!'}, status=status.HTTP_204_NO_CONTENT)
+
+
+
+
+class NotificationListView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        notifications = Notification.objects.filter(
+            user = request.user
+        ).order_by('-created_at')
+
+        serializer = NotificationSerializer(notifications, many = True)
+        return Response(serializer.data)
+
+
+class MarkNotificationReadView(APIView):
+    permission_classes = [IsAuthenticated]
+    def patch(self, request, pk):
+        notification = Notification.objects.filter(
+            id = pk,
+            user = request.user
+        ).first()
+
+        if not notification:
+            return Response(
+                {'error': 'Notification not found'},
+                status = status.HTTP_404_NOT_FOUND
+            )
+
+        notification.is_read = True
+        notification.save()
+
+        return Response(
+            {'message': 'Notification marked as read'}
+        )
+
 
 
 class PrescriptionListCreateView(generics.ListCreateAPIView):
